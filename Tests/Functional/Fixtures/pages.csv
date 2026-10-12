@@ -1,0 +1,15 @@
+"pages"
+,"uid","pid","title","slug","doktype","is_siteroot","hidden"
+,1,0,"Test site","/",1,1,0
+,2,1,"Events","/events",1,0,0
+,3,1,"Selected records","/selected",254,0,0
+,4,1,"Other records","/other",254,0,0
+,5,1,"Default records","/default",254,0,0
+
+"tt_content"
+,"uid","pid","CType","header","colPos","pages","hidden"
+,1,2,"events_list","Events",0,"3",0
+
+"be_users"
+,"uid","pid","username","admin","disable"
+,1,0,"test-admin",1,0

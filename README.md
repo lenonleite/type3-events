@@ -44,32 +44,58 @@ its `require-dev` dependencies or Composer scripts.
 | `composer cs:check` | TYPO3 PHP-CS-Fixer rules without changing files |
 | `composer cs:fix` | Apply TYPO3 formatting |
 | `composer phpstan` | Level 8 static analysis, including test scripts |
-| `composer test` | 28 HTTP smoke checks against a disposable TYPO3 site |
+| `composer test` / `composer test:functional` | PHPUnit functional tests with TYPO3’s Testing Framework |
 | `composer check` | Run all the checks above, without applying fixes |
 
-The PHP CLI needs TYPO3's required extensions, plus PDO SQLite. Composer must
-be available on `PATH`; the first test run downloads the test site's dependencies.
-The test runner creates a minimal TYPO3 installation in `.build/site`, initializes
-its own SQLite database, and starts a temporary HTTP server on a free loopback
-port. It stops the server even if a test fails. Server output is in
-`.build/server.log`.
+The PHP CLI needs TYPO3's required extensions, plus PDO SQLite. After
+`composer install`, running tests requires no additional downloads or HTTP server.
 
-Tests cover list/detail rendering, date sorting, escaping, readable URLs,
-duplicate slugs, Starting point/default-folder behavior, 404 responses, and cache
-invalidation. Fixtures are created and soft-deleted through TYPO3 DataHandler.
-The test site is reused between runs; `.build/` can be removed to start fresh.
-Your normal site's database and records are not used.
+### How the tests work
 
-The test harness uses `Tests/Fixtures/composer.json` to install this extension as
-a path dependency. This verifies integration in an actual TYPO3 project without
-requiring the parent learning project.
+`composer test` calls PHPUnit using `phpunit.xml.dist`. PHPUnit discovers the
+`#[Test]` methods in `Tests/Functional/EventPluginTest.php`. That class extends
+TYPO3's `FunctionalTestCase`, which creates an isolated TYPO3 installation and
+SQLite database and resets the database between tests.
+
+The fixture `Tests/Functional/Fixtures/pages.csv` provides the pages, content
+plugin, and backend test user. Events and editor changes are processed through
+TYPO3 DataHandler. Frontend requests use the framework's
+`executeFrontendSubRequest()` method, exercising TYPO3 routing, controllers,
+Fluid templates, and response generation without a separate web server.
+
+The suite preserves the former smoke checks as 12 named test cases (including
+three data-provider cases). It covers list/detail rendering, date ordering,
+escaping, readable URLs, duplicate slugs, Starting point/default-folder behavior,
+404 responses, and cache invalidation. Page caching is explicitly enabled, and
+cache tests assert that it is populated before testing invalidation.
+
+Generated test installations live under `public/typo3temp/var/tests/`, which Git
+ignores. Your normal site's database and records are not used.
+
+Run just one scenario from the extension root:
+
+```sh
+composer test:functional -- --filter emptyListDisplaysHelpfulMessage
+```
+
+We use PHPUnit 11 to support PHP 8.2 and TYPO3 Testing Framework 10 for TYPO3 14.
+Framework 10 currently requires the explicit `@dev` stability flag. This exception
+applies only to that development dependency; the project's global minimum
+stability remains stable.
+
+These are functional tests because the current behavior depends on TYPO3 and the
+database. Add unit tests when introducing logic that can usefully be tested in
+isolation; trivial getter tests are not needed to fill a separate suite.
+
+See TYPO3's official [extension testing guidance](https://docs.typo3.org/m/typo3/reference-coreapi/14.3/en-us/Testing/ExtensionTesting.html)
+and [functional testing documentation](https://docs.typo3.org/m/typo3/reference-coreapi/14.3/en-us/Testing/FunctionalTesting/Index.html).
 
 ## GitHub Actions
 
 Publish the **contents of this directory** as the repository root, so GitHub sees
 `.github/workflows/ci.yml`. The workflow runs on pushes, pull requests, and manual
-dispatch, on PHP 8.2 and 8.4. It validates Composer metadata and runs
-`composer check`. It needs no site credentials or database service.
+dispatch, on PHP 8.2 and 8.4. It validates Composer metadata and shows separate steps for
+PHPCS, PHP-CS-Fixer, PHPStan, and PHPUnit. It needs no site credentials or database service.
 
 Generated dependencies, Composer locks, caches, test databases and local
 configuration are ignored. CI resolves dependencies from the supported version

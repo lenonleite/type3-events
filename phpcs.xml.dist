@@ -13,8 +13,4 @@
         <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine"/>
         <exclude name="Squiz.WhiteSpace.ScopeClosingBrace.ContentBefore"/>
     </rule>
-    <!-- These files are executable CLI test scripts, with local helper functions. -->
-    <rule ref="PSR1.Files.SideEffects">
-        <exclude-pattern>*/Tests/*</exclude-pattern>
-    </rule>
 </ruleset>

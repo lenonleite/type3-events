@@ -31,5 +31,11 @@ jobs:
         run: composer validate --strict
       - name: Install development dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
-      - name: PHPCS, PHP-CS-Fixer, PHPStan and HTTP tests
-        run: composer check
+      - name: PHPCS
+        run: composer phpcs
+      - name: PHP-CS-Fixer
+        run: composer cs:check
+      - name: PHPStan
+        run: composer phpstan
+      - name: PHPUnit functional tests
+        run: composer test

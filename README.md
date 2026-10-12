@@ -45,12 +45,65 @@ Responses use `Cache-Control: no-store`. The endpoint also works below a site's
 base path or language prefix. Event records currently have no translated variants.
 
 `Configuration/RequestMiddlewares.php` registers the PSR-15 middleware.
-`Classes/Middleware/EventApiMiddleware.php` handles the URL and JSON response.
+`Classes/Middleware/EventApiMiddleware.php` matches the URL and delegates to
+`Classes/Controller/EventApiController.php`, which builds the JSON response.
 `Classes/Domain/Repository/EventApiRepository.php` queries the permitted folder
 using parameterized database queries. This endpoint needs no Fluid template.
 Flush TYPO3 caches after installing the new middleware.
 
 See TYPO3's [middleware documentation](https://docs.typo3.org/m/typo3/reference-coreapi/14.3/en-us/ApiOverview/RequestLifeCycle/Middlewares.html).
+
+### How this follows TYPO3 conventions
+
+Follow a request to `GET /api/events/11` through these steps:
+
+1. TYPO3 resolves the site and language. Our middleware runs after site resolution,
+   maintenance handling and base redirects, but before page resolution. These
+   ordering constraints belong in `Configuration/RequestMiddlewares.php`.
+2. `EventApiMiddleware::process()` checks that the site's Events settings exist
+   and matches the path relative to the site/language base. An unrelated URL is
+   passed to the next TYPO3 handler, preserving normal page rendering.
+3. The middleware calls `EventApiController::showAction()` with the PSR-7 request,
+   the raw ID from the URL, and the site's storage folder ID.
+4. The controller checks the method and ID, asks the repository for the event,
+   and selects the HTTP status and JSON response. For HEAD it removes the body.
+5. `EventApiRepository::findInStorageFolder()` uses TYPO3's database API to query
+   by UID, folder and deletion status and returns the documented public fields.
+
+The API controller is an ordinary PHP service, not an Extbase `ActionController`.
+The method name `showAction` is descriptive: our middleware explicitly calls it.
+There is no automatic Extbase action dispatch, Fluid template, or route enhancer
+for this endpoint. The existing HTML plugin still uses Extbase and its own route
+enhancer. TYPO3's middleware guidance warns against using Extbase before its
+frontend TypoScript context exists; this API uses the database API directly.
+
+`Configuration/Services.yaml` enables constructor autowiring. TYPO3 creates and
+injects the controller, repository and `ConnectionPool`. The PSR-7 request is
+passed per request; it is not a constructor dependency. Responses use TYPO3's
+`JsonResponse`, which implements the PSR-7 response contract.
+
+### SOLID and complexity
+
+The responsibility split is a design choice for this extension; TYPO3 does not
+require this exact three-class layout.
+
+| Principle | Application and limits here |
+| --- | --- |
+| Single responsibility | Middleware handles site/path dispatch; controller handles the HTTP endpoint; repository handles the database read and public result mapping. |
+| Open/closed | Responsibilities can evolve separately, but adding an endpoint may still require changing dispatch. We have not introduced a generic routing framework. |
+| Liskov substitution | The middleware honors its PSR-15 contract by returning a response or delegating. Our application classes do not use inheritance. |
+| Interface segregation | Each application service exposes a small operation; there is no broad CRUD interface. |
+| Dependency inversion | Dependencies are constructor-injected, but controller and repository dependencies are concrete classes. This is DI, not strict dependency inversion. A repository interface would be useful if multiple storage implementations or an explicit domain boundary were needed. |
+
+SOLID is design guidance, not something PHPCS or PHPStan can certify. Keeping the
+validation, status codes and HEAD handling in the HTTP controller makes those
+rules visible without adding a class for each condition. The repository currently
+returns an API read model (an array of public fields); a separate mapper could
+be justified if other consumers require different representations.
+
+`Tests/Functional/EventApiTest.php` exercises the real TYPO3 request stack and
+database, including delegation to ordinary pages. Run `composer check` to verify
+behavior, formatting and static analysis after changing this flow.
 
 ## Develop and check
 

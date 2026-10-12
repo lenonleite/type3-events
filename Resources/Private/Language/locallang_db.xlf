@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" datatype="plaintext" original="messages" product-name="events">
+        <body>
+            <trans-unit id="event.slug" resname="event.slug">
+                <source>URL segment</source>
+            </trans-unit>
+            <trans-unit id="plugin.list.title" resname="plugin.list.title">
+                <source>Events: List</source>
+            </trans-unit>
+            <trans-unit id="plugin.list.description" resname="plugin.list.description">
+                <source>Display events from the selected Starting point folder, ordered by date.</source>
+            </trans-unit>
+            <trans-unit id="event" resname="event">
+                <source>Event</source>
+            </trans-unit>
+            <trans-unit id="event.title" resname="event.title">
+                <source>Title</source>
+            </trans-unit>
+            <trans-unit id="event.description" resname="event.description">
+                <source>Description</source>
+            </trans-unit>
+            <trans-unit id="event.event_date" resname="event.event_date">
+                <source>Date and time</source>
+            </trans-unit>
+            <trans-unit id="event.location" resname="event.location">
+                <source>Location</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

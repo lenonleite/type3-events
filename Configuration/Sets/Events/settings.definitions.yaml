@@ -1,0 +1,11 @@
+categories:
+  events:
+    label: Events
+
+settings:
+  events.storagePid:
+    label: Default event records folder
+    description: Used when the Events plugin has no Starting point selected.
+    category: events
+    type: int
+    default: 0

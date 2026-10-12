@@ -1,0 +1,28 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+<f:if condition="{events}">
+    <f:then>
+        <ul class="events-list">
+            <f:for each="{events}" as="event">
+                <li>
+                    <h2>
+                        <f:link.action action="show" arguments="{event: event.uid}">{event.title}</f:link.action>
+                    </h2>
+                    <f:if condition="{event.eventDate}">
+                        <p>
+                            <time datetime="{event.eventDate -> f:format.date(format: 'c')}">
+                                <f:format.date format="d/m/Y H:i">{event.eventDate}</f:format.date>
+                            </time>
+                        </p>
+                    </f:if>
+                    <f:if condition="{event.location}">
+                        <p>{event.location}</p>
+                    </f:if>
+                </li>
+            </f:for>
+        </ul>
+    </f:then>
+    <f:else>
+        <p><f:translate key="list.empty" /></p>
+    </f:else>
+</f:if>
+</html>

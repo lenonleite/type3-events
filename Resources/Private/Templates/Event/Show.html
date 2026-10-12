@@ -1,0 +1,21 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+<article class="event-detail">
+    <h2>{event.title}</h2>
+    <f:if condition="{event.eventDate}">
+        <p>
+            <time datetime="{event.eventDate -> f:format.date(format: 'c')}">
+                <f:format.date format="d/m/Y H:i">{event.eventDate}</f:format.date>
+            </time>
+        </p>
+    </f:if>
+    <f:if condition="{event.location}">
+        <p>{event.location}</p>
+    </f:if>
+    <f:if condition="{event.description}">
+        <p><f:format.nl2br>{event.description}</f:format.nl2br></p>
+    </f:if>
+    <p>
+        <f:link.action action="list"><f:translate key="show.back" /></f:link.action>
+    </p>
+</article>
+</html>

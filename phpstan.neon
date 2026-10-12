@@ -1,0 +1,11 @@
+includes:
+    - vendor/saschaegerer/phpstan-typo3/extension.neon
+
+parameters:
+    level: 8
+    paths:
+        - Classes
+        - Configuration/TCA
+        - ext_localconf.php
+        - Tests
+    tmpDir: var/phpstan

@@ -1,0 +1,18 @@
+routeEnhancers:
+  Events:
+    type: Extbase
+    extension: Events
+    plugin: List
+    routes:
+      - routePath: '/'
+        _controller: 'Event::list'
+      - routePath: '/{event_slug}'
+        _controller: 'Event::show'
+        _arguments:
+          event_slug: event
+    defaultController: 'Event::list'
+    aspects:
+      event_slug:
+        type: PersistedAliasMapper
+        tableName: tx_events_domain_model_event
+        routeFieldName: slug

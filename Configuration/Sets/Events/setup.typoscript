@@ -1,0 +1,7 @@
+plugin.tx_events.persistence.storagePid = {$events.storagePid}
+
+plugin.tx_events_list {
+    view {
+        templateRootPaths.10 = EXT:events/Resources/Private/Templates/
+    }
+}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" datatype="plaintext" original="messages" product-name="events">
+        <body>
+            <trans-unit id="show.back" resname="show.back">
+                <source>Back to events</source>
+            </trans-unit>
+            <trans-unit id="list.empty" resname="list.empty">
+                <source>No events have been added yet.</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

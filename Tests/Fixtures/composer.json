@@ -1,0 +1,19 @@
+{
+    "name": "study/events-test-site",
+    "description": "Disposable TYPO3 site for Events HTTP tests",
+    "type": "project",
+    "license": "GPL-2.0-or-later",
+    "repositories": [{"type": "path", "url": "../..", "options": {"symlink": true}}],
+    "require": {
+        "study/events": "@dev",
+        "typo3/cms-backend": "^14.3",
+        "typo3/cms-fluid-styled-content": "^14.3",
+        "typo3/cms-install": "^14.3"
+    },
+    "config": {
+        "allow-plugins": {
+            "typo3/class-alias-loader": true,
+            "typo3/cms-composer-installers": true
+        }
+    }
+}

@@ -6,7 +6,7 @@ parameters:
     level: 8
     paths:
         - Classes
-        - Configuration/TCA
+        - Configuration
         - ext_localconf.php
         - Tests
     tmpDir: var/phpstan

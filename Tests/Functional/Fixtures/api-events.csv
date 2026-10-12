@@ -1,0 +1,5 @@
+"tx_events_domain_model_event"
+,"uid","pid","title","description","event_date","location","deleted","slug"
+,11,5,"API workshop","First line","1794506400","Lisbon",0,"api-workshop"
+,12,3,"Other folder event","Not exposed","1794506400","Porto",0,"other-event"
+,13,5,"Deleted event","Not exposed","1794506400","Lisbon",1,"deleted-event"

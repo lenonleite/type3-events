@@ -18,6 +18,40 @@ The site must render content elements (for example using Fluid Styled Content).
 No dependency on the Camino theme is required. The extension's site set provides
 the routing configuration in `Configuration/Sets/Events/route-enhancers.yaml`.
 
+## Read-only JSON API
+
+With the Events site set enabled, configure `events.storagePid` to the folder
+whose events should be publicly readable. The API uses this site default,
+independently of individual content elements' Starting point selections.
+A zero or unset folder exposes no events. No authentication is required.
+
+Request an event by its database UID:
+
+```sh
+curl https://your-site.example/api/events/11
+```
+
+Example response (HTTP 200):
+
+```json
+{"data":{"id":11,"title":"API workshop","description":"First line","eventDate":"2026-11-12T18:00:00+00:00","location":"Lisbon"}}
+```
+
+Dates use ISO 8601 in UTC and can be null for records without a date.
+Missing, deleted, and out-of-folder events return HTTP 404 with
+`{"error":{"code":"event_not_found","message":"Event not found."}}`.
+Malformed IDs return 400. GET and HEAD are supported; other methods return 405.
+Responses use `Cache-Control: no-store`. The endpoint also works below a site's
+base path or language prefix. Event records currently have no translated variants.
+
+`Configuration/RequestMiddlewares.php` registers the PSR-15 middleware.
+`Classes/Middleware/EventApiMiddleware.php` handles the URL and JSON response.
+`Classes/Domain/Repository/EventApiRepository.php` queries the permitted folder
+using parameterized database queries. This endpoint needs no Fluid template.
+Flush TYPO3 caches after installing the new middleware.
+
+See TYPO3's [middleware documentation](https://docs.typo3.org/m/typo3/reference-coreapi/14.3/en-us/ApiOverview/RequestLifeCycle/Middlewares.html).
+
 ## Develop and check
 
 This directory is the repository root. From a standalone checkout, run:
@@ -53,7 +87,7 @@ The PHP CLI needs TYPO3's required extensions, plus PDO SQLite. After
 ### How the tests work
 
 `composer test` calls PHPUnit using `phpunit.xml.dist`. PHPUnit discovers the
-`#[Test]` methods in `Tests/Functional/EventPluginTest.php`. That class extends
+`#[Test]` methods in `Tests/Functional/`. The test classes extend
 TYPO3's `FunctionalTestCase`, which creates an isolated TYPO3 installation and
 SQLite database and resets the database between tests.
 
@@ -63,11 +97,14 @@ TYPO3 DataHandler. Frontend requests use the framework's
 `executeFrontendSubRequest()` method, exercising TYPO3 routing, controllers,
 Fluid templates, and response generation without a separate web server.
 
-The suite preserves the former smoke checks as 12 named test cases (including
-three data-provider cases). It covers list/detail rendering, date ordering,
+The plugin tests cover list/detail rendering, date ordering,
 escaping, readable URLs, duplicate slugs, Starting point/default-folder behavior,
 404 responses, and cache invalidation. Page caching is explicitly enabled, and
 cache tests assert that it is populated before testing invalidation.
+
+API tests cover JSON fields, folder boundaries, deleted records, invalid IDs,
+HTTP methods, site base paths, site-set activation, fresh data after edits, and
+continued rendering of normal pages. Together the suites run 32 test cases.
 
 Generated test installations live under `public/typo3temp/var/tests/`, which Git
 ignores. Your normal site's database and records are not used.
